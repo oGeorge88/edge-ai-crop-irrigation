@@ -166,5 +166,5 @@ void loop() {
   Serial.printf("  >> PUMP : %s\n",         pump ? "ON" : "OFF");
   Serial.println(F("--------------------------------------------\n"));
 
-  delay(1000);
+  delay(200);   // 200 ms for fast Wokwi feedback; change to 1000 on real hardware
 }
