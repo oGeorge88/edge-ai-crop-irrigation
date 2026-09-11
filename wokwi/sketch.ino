@@ -10,9 +10,14 @@
  *   Relay module    -> GPIO5   Water pump
  *   LED (red)       -> GPIO6   Pump ON indicator
  *   Push button     -> GPIO7   Cycle disease mode
- *   LCD 16x2 parallel 4-bit: RS=38, EN=39, D4=40, D5=41, D6=42, D7=43
+ *   LCD 16x2 parallel 4-bit: RS=38, EN=39, D4=40, D5=41, D6=42, D7=45
  *
- * Press the green button to cycle disease mode:
+ * AI pipeline integration (serial command interface):
+ *   Send "MODE:NORMAL\n", "MODE:REDUCE\n", or "MODE:INCREASE\n" over the
+ *   serial port (115200 baud) to set the disease mode remotely.
+ *   pipeline.py (repo root) runs MobileNetV2 inference and sends this command.
+ *
+ * Press the green button to cycle disease mode (manual override):
  *   NORMAL   -> irrigate when soil < 40%  (healthy / viral)
  *   REDUCE   -> irrigate when soil < 25%  (fungal / bacterial)
  *   INCREASE -> irrigate when soil < 55%  (spider mites)
@@ -55,6 +60,8 @@ const float THRESHOLD[]    = { THRESH_NORMAL, THRESH_REDUCE, THRESH_INCREASE };
 DiseaseMode diseaseMode  = NORMAL;
 bool        lastBtn      = HIGH;
 uint32_t    lastDebounce = 0;
+String      serialBuf;          // accumulates incoming serial bytes
+bool        aiModeActive = false; // true once AI pipeline has set the mode
 
 DHT dht(DHT_PIN, DHT22);
 
@@ -106,6 +113,27 @@ void loop() {
   }
   lastBtn = btn;
 
+  // AI pipeline serial interface — non-blocking character accumulation
+  while (Serial.available()) {
+    char c = Serial.read();
+    if (c == '\n') {
+      serialBuf.trim();
+      if (serialBuf == "MODE:NORMAL") {
+        diseaseMode  = NORMAL;
+        aiModeActive = true;
+      } else if (serialBuf == "MODE:REDUCE") {
+        diseaseMode  = REDUCE;
+        aiModeActive = true;
+      } else if (serialBuf == "MODE:INCREASE") {
+        diseaseMode  = INCREASE;
+        aiModeActive = true;
+      }
+      serialBuf = "";
+    } else {
+      serialBuf += c;
+    }
+  }
+
   float soil = readSoilMoisture();
   float rain = readRainfall();
   float temp = dht.readTemperature();
@@ -129,7 +157,7 @@ void loop() {
   Serial.printf("  Temp    : %5.1f C\n",   temp);
   Serial.printf("  Humidity: %5.1f %%\n",  hum);
   Serial.printf("  Rain    : %5.1f mm\n",  rain);
-  Serial.printf("  Mode    : %s\n",         MODE_TAG[diseaseMode]);
+  Serial.printf("  Mode    : %s  [%s]\n",    MODE_TAG[diseaseMode], aiModeActive ? "AI" : "manual");
   Serial.printf("  Disease : %s\n",         DISEASE_NAME[diseaseMode]);
   if (soil < THRESH_CRITICAL)
     Serial.println(F("  !! EMERGENCY -- critically dry !!"));

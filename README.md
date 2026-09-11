@@ -53,6 +53,12 @@ KMUTL/
 ├── simulation/
 │   └── demo.py                       # 24-hour integrated farm simulation
 │
+├── wokwi/
+│   ├── sketch.ino                    # ESP32-S3 firmware (disease mode + irrigation)
+│   ├── diagram.json                  # Wokwi circuit wiring
+│   └── scenario.yaml                 # automated scenario test suite
+│
+├── pipeline.py                       # AI → firmware bridge (inference + serial send)
 ├── requirements.txt
 └── README.md
 ```
@@ -99,7 +105,35 @@ Example output:
 python irrigation/predict.py --soil 32 --temp 31 --humidity 60 --rain 0 --hours_since 18
 ```
 
-### 4. Run the integrated 24-hour simulation
+### 4. Run the AI → firmware pipeline
+
+```bash
+# Dry-run: run inference and print the serial command (no hardware needed)
+python pipeline.py path/to/leaf.jpg
+
+# With ESP32-S3 connected via USB
+python pipeline.py path/to/leaf.jpg --port COM3
+```
+
+Example output:
+```
+======================================================
+  Image     : leaf.jpg
+  Status    : DISEASED
+  Disease   : Tomato_Late_blight
+  Confidence: 94.1%
+  Latency   : 6.1 ms
+  ▶ Irrigation mode: REDUCE
+======================================================
+
+  Wokwi serial command: MODE:REDUCE
+  (paste into Wokwi serial monitor and press Enter)
+```
+
+`pipeline.py` sends `MODE:REDUCE\n` (or `NORMAL` / `INCREASE`) over 115200-baud serial.  
+The ESP32-S3 firmware parses the command and immediately updates the irrigation threshold — no reboot required.
+
+### 5. Run the integrated 24-hour simulation
 
 ```bash
 # Without disease detection (sensor-only)
