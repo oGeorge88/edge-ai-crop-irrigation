@@ -193,8 +193,10 @@ For edge deployment on Raspberry Pi / ESP32-S3, replace `tensorflow-cpu` with `t
 
 ## Wokwi Hardware Simulation
 
-A full ESP32-S3 simulation is provided in `wokwi/` and can be opened at
-[wokwi.com/projects/474855871911412737](https://wokwi.com/projects/474855871911412737).
+A full ESP32-S3 simulation is provided in `wokwi/`.
+
+**▶ [Open Simulation on Wokwi](https://wokwi.com/projects/474855871911412737)**  
+`https://wokwi.com/projects/474855871911412737`
 
 ### Components
 
