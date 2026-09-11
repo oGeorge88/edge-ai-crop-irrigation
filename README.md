@@ -1,7 +1,7 @@
 # Edge AI — Crop Disease Detection & Automated Irrigation System
 
-**Author:** George Obinna Oguejiofor | King Mongkut's University of Technology Thonburi (KMUTT)  
-**Contact:** george.ogue@kmutt.ac.th
+**Author:** George Obinna Oguejiofor | King Mongkut's Institute of Technology Ladkrabang (KMITL)  
+**Contact:** sqandor4life88@gmail.com
 
 A software-first prototype of an edge-deployable system that combines computer-vision-based crop disease detection with an ML-driven automated irrigation controller. The two subsystems share a common inference pipeline so that detected disease conditions directly modify irrigation decisions.
 
