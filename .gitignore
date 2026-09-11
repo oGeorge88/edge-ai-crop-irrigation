@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# Virtual environment
+venv/
+.env/
+env/
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Data (large raw datasets — keep processed/model outputs)
+irrigation/data/*.csv
+
+# Logs
+simulation/sim_log.csv
+
+# OS
+.DS_Store
+Thumbs.db
