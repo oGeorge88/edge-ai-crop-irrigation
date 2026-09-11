@@ -147,7 +147,7 @@ void loop() {
   digitalWrite(LED_PIN,   pump ? HIGH : LOW);
 
   char r0[17], r1[17];
-  snprintf(r0, sizeof(r0), "S:%3.0f%% T:%2.0fC H:%2.0f", soil, temp, hum);
+  snprintf(r0, sizeof(r0), "S:%3.0f%% T:%2.0f H:%2.0f", soil, temp, hum);
   snprintf(r1, sizeof(r1), "%s %s", pump ? "PUMP ON " : "PUMP OFF", MODE_TAG[diseaseMode]);
   lcd.setCursor(0, 0); lcd.print(r0);
   lcd.setCursor(0, 1); lcd.print(r1);
