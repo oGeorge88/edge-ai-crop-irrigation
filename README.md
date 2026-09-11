@@ -191,6 +191,45 @@ For edge deployment on Raspberry Pi / ESP32-S3, replace `tensorflow-cpu` with `t
 
 ---
 
+## Wokwi Hardware Simulation
+
+A full ESP32-S3 simulation is provided in `wokwi/` and can be opened at
+[wokwi.com/projects/474855871911412737](https://wokwi.com/projects/474855871911412737).
+
+### Components
+
+| Component | Pin | Role |
+|-----------|-----|------|
+| Potentiometer 1 | GPIO 1 | Soil moisture (0–100 %) |
+| Potentiometer 2 | GPIO 2 | Rainfall 24 h (0–10 mm) |
+| DHT22 | GPIO 4 | Temperature + humidity |
+| Relay module | GPIO 5 | Water pump |
+| Red LED | GPIO 6 | Pump ON indicator |
+| Push button (green) | GPIO 7 | Cycle disease mode |
+| LCD 16×2 (parallel 4-bit) | RS=38 EN=39 D4–D7=40–42,45 | Live status display |
+
+### Scenario Test Results
+
+Automated tests run via `wokwi/scenario.yaml` (Wokwi VS Code extension / CI).
+Manual verification performed in Wokwi web simulator on 2026-09-11.
+
+| # | Soil | Rain | Mode | Expected | LCD output | Result |
+|---|------|------|------|----------|------------|--------|
+| 1 | 25 % | 1 mm | NORMAL | PUMP ON | `PUMP ON  NORMAL` | ✅ PASS |
+| 2 | 25 % | 6.5 mm | NORMAL | PUMP OFF (rain guard) | `PUMP OFF NORMAL` | ✅ PASS |
+| 3 | 15 % | 6.5 mm | NORMAL | PUMP ON (emergency override) | `PUMP ON  NORMAL` | ✅ PASS |
+| 4 | 30 % | 1 mm | REDUCE | PUMP OFF (above 25 % threshold) | — | ⏸ pending hardware |
+| 5 | 20 % | 1 mm | REDUCE | PUMP ON (below 25 % threshold) | — | ⏸ pending hardware |
+| 6 | 42 % | 1 mm | INCREASE | PUMP ON (below 55 % threshold) | — | ⏸ pending hardware |
+
+> **Note:** Scenarios 4–6 require cycling the disease mode via the push button.
+> The Wokwi free-tier web simulator ran at ~3 % of real-time speed during testing,
+> making the button's 1-second debounce window ~33 real seconds — impractical to
+> test interactively. These scenarios will be verified on physical ESP32-S3 hardware
+> or via the Wokwi VS Code extension (full local CPU speed).
+
+---
+
 ## Deployment Notes
 
 The int8 TFLite model (`disease_detection/models/mobilenetv2_int8.tflite`) runs on:
