@@ -46,7 +46,7 @@
     ["esp:40",   "lcd:D4",       "orange", []],
     ["esp:41",   "lcd:D5",       "purple", []],
     ["esp:42",   "lcd:D6",       "white",  []],
-    ["esp:43",   "lcd:D7",       "cyan",   []],
+    ["esp:45",   "lcd:D7",       "cyan",   []],
     ["esp:5V",   "lcd:A",        "red",    []],
     ["esp:G",    "lcd:K",        "black",  []]
   ],

@@ -37,8 +37,8 @@
 #define LED_PIN     6
 #define BUTTON_PIN  7
 
-// -- LCD (parallel 4-bit, safe GPIO on right header) ------------------------
-LiquidCrystal lcd(38, 39, 40, 41, 42, 43); // RS, EN, D4, D5, D6, D7
+// -- LCD (parallel 4-bit) — avoid GPIO43/44 (UART0 TX/RX on ESP32-S3) -------
+LiquidCrystal lcd(38, 39, 40, 41, 42, 45); // RS, EN, D4, D5, D6, D7
 
 // -- Irrigation thresholds --------------------------------------------------
 #define THRESH_CRITICAL  20.0f
