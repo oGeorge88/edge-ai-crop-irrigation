@@ -208,4 +208,4 @@ Output: softmax probabilities over 15 classes (uint8 dequantised)
 
 ## License
 
-This project is part of ongoing academic research at KMUTT. All rights reserved.
+This project is part of ongoing academic research at KMITL. All rights reserved.

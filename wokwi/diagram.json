@@ -1,71 +1,17 @@
 {
   "version": 1,
-  "author": "George Obinna Oguejiofor — KMITL",
+  "author": "George Obinna Oguejiofor -- KMITL",
   "editor": "wokwi",
   "parts": [
-    {
-      "id": "esp",
-      "type": "wokwi-esp32-s3-devkitc-1",
-      "top": 160,
-      "left": 200,
-      "attrs": {}
-    },
-    {
-      "id": "soil_pot",
-      "type": "wokwi-potentiometer",
-      "top": 80,
-      "left": -60,
-      "attrs": { "label": "Soil Moisture" }
-    },
-    {
-      "id": "rain_pot",
-      "type": "wokwi-potentiometer",
-      "top": 240,
-      "left": -60,
-      "attrs": { "label": "Rainfall 24h" }
-    },
-    {
-      "id": "dht",
-      "type": "wokwi-dht22",
-      "top": 60,
-      "left": 560,
-      "attrs": {}
-    },
-    {
-      "id": "relay",
-      "type": "wokwi-relay-module",
-      "top": 220,
-      "left": 560,
-      "attrs": {}
-    },
-    {
-      "id": "r1",
-      "type": "wokwi-resistor",
-      "top": 408,
-      "left": 494,
-      "attrs": { "value": "220" }
-    },
-    {
-      "id": "led1",
-      "type": "wokwi-led",
-      "top": 390,
-      "left": 590,
-      "attrs": { "color": "red", "label": "Pump ON" }
-    },
-    {
-      "id": "btn1",
-      "type": "wokwi-pushbutton",
-      "top": 460,
-      "left": 560,
-      "attrs": { "color": "green" }
-    },
-    {
-      "id": "lcd",
-      "type": "wokwi-lcd1602",
-      "top": -50,
-      "left": 180,
-      "attrs": { "pins": "i2c" }
-    }
+    { "id": "esp",      "type": "wokwi-esp32-s3-devkitc-1", "top": 160, "left": 200, "attrs": {} },
+    { "id": "soil_pot", "type": "wokwi-potentiometer",       "top": 80,  "left": -60, "attrs": { "label": "Soil Moisture" } },
+    { "id": "rain_pot", "type": "wokwi-potentiometer",       "top": 240, "left": -60, "attrs": { "label": "Rainfall 24h" } },
+    { "id": "dht",      "type": "wokwi-dht22",               "top": 60,  "left": 560, "attrs": {} },
+    { "id": "relay",    "type": "wokwi-relay-module",         "top": 220, "left": 560, "attrs": {} },
+    { "id": "r1",       "type": "wokwi-resistor",             "top": 408, "left": 494, "attrs": { "value": "220" } },
+    { "id": "led1",     "type": "wokwi-led",                  "top": 390, "left": 590, "attrs": { "color": "red", "label": "Pump ON" } },
+    { "id": "btn1",     "type": "wokwi-pushbutton",           "top": 460, "left": 560, "attrs": { "color": "green" } },
+    { "id": "lcd",      "type": "wokwi-lcd1602",              "top": -50, "left": 180, "attrs": {} }
   ],
   "connections": [
     ["esp:3V3",   "soil_pot:VCC", "red",    []],
@@ -91,10 +37,18 @@
     ["esp:7",     "btn1:1.r",     "purple", []],
     ["esp:GND.2", "btn1:2.r",     "black",  []],
 
-    ["esp:3V3",   "lcd:VCC",      "red",    []],
-    ["esp:GND.1", "lcd:GND",      "black",  []],
-    ["esp:8",     "lcd:SDA",      "blue",   []],
-    ["esp:9",     "lcd:SCL",      "cyan",   []]
+    ["esp:GND.1", "lcd:VSS",      "black",  []],
+    ["esp:5V",    "lcd:VDD",      "red",    []],
+    ["esp:GND.1", "lcd:V0",       "black",  []],
+    ["esp:38",    "lcd:RS",       "green",  []],
+    ["esp:GND.1", "lcd:RW",       "black",  []],
+    ["esp:39",    "lcd:E",        "yellow", []],
+    ["esp:40",    "lcd:D4",       "orange", []],
+    ["esp:41",    "lcd:D5",       "purple", []],
+    ["esp:42",    "lcd:D6",       "white",  []],
+    ["esp:43",    "lcd:D7",       "cyan",   []],
+    ["esp:5V",    "lcd:A",        "red",    []],
+    ["esp:GND.1", "lcd:K",        "black",  []]
   ],
   "dependencies": {}
 }
