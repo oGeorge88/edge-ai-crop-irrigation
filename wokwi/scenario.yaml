@@ -1,0 +1,150 @@
+version: 1
+author: "George Obinna Oguejiofor -- KMITL"
+name: "Edge AI Irrigation Controller — Validation Suite"
+description: |
+  6 automated scenarios validating the irrigation decision logic:
+  rainfall guard, emergency override, and disease-mode thresholds.
+  Checks serial-monitor output; each scenario takes ~5 s to run.
+
+steps:
+  # ── Boot: wait for setup() splash + DHT22 init ───────────────────────────
+  - delay: 3500
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Scenario 1 — Normal dry soil, low rain → PUMP ON
+  #   Soil=25%  Rain=1mm  Mode=NORMAL(default)
+  #   Expected: rainfall guard inactive, soil < 40% threshold → PUMP ON
+  # ═══════════════════════════════════════════════════════════════════════════
+  - set-control:
+      id: soil_pot
+      name: value
+      value: 0.25
+  - set-control:
+      id: rain_pot
+      name: value
+      value: 0.10
+  - delay: 2500
+  - serial-monitor:
+      wait-for: ">> PUMP : ON"
+      timeout: 3000
+  - serial-monitor:
+      wait-for: "Mode    : NORMAL"
+      timeout: 3000
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Scenario 2 — Rainfall guard blocks pump despite dry soil
+  #   Soil=25%  Rain=6.5mm  Mode=NORMAL
+  #   Expected: rain > 5mm → rainfall guard fires → PUMP OFF
+  # ═══════════════════════════════════════════════════════════════════════════
+  - set-control:
+      id: rain_pot
+      name: value
+      value: 0.65
+  - delay: 2500
+  - serial-monitor:
+      wait-for: "Skipping: rainfall guard active"
+      timeout: 3000
+  - serial-monitor:
+      wait-for: ">> PUMP : OFF"
+      timeout: 3000
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Scenario 3 — Emergency override ignores rainfall guard
+  #   Soil=15%  Rain=6.5mm  Mode=NORMAL
+  #   Expected: soil < 20% critical → emergency override → PUMP ON
+  #             even though rainfall guard would otherwise block it
+  # ═══════════════════════════════════════════════════════════════════════════
+  - set-control:
+      id: soil_pot
+      name: value
+      value: 0.15
+  - delay: 2500
+  - serial-monitor:
+      wait-for: "!! EMERGENCY"
+      timeout: 3000
+  - serial-monitor:
+      wait-for: ">> PUMP : ON"
+      timeout: 3000
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Scenario 4 — REDUCE mode: soil above REDUCE threshold → PUMP OFF
+  #   Soil=30%  Rain=1mm  Mode=REDUCE (threshold=25%)
+  #   Expected: soil 30% > 25% threshold → PUMP OFF
+  # ═══════════════════════════════════════════════════════════════════════════
+  - set-control:
+      id: soil_pot
+      name: value
+      value: 0.25
+  - set-control:
+      id: rain_pot
+      name: value
+      value: 0.10
+  - delay: 500
+  # Button press cycles NORMAL → REDUCE (hold > 1 loop cycle = 1 s)
+  - set-control:
+      id: btn1
+      name: pressed
+      value: 1
+  - delay: 1500
+  - set-control:
+      id: btn1
+      name: pressed
+      value: 0
+  - delay: 500
+  - set-control:
+      id: soil_pot
+      name: value
+      value: 0.30
+  - delay: 2500
+  - serial-monitor:
+      wait-for: "Mode    : REDUCE"
+      timeout: 3000
+  - serial-monitor:
+      wait-for: ">> PUMP : OFF"
+      timeout: 3000
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Scenario 5 — REDUCE mode: soil below REDUCE threshold → PUMP ON
+  #   Soil=20%  Rain=1mm  Mode=REDUCE (threshold=25%)
+  #   Expected: soil 20% < 25% threshold → PUMP ON  (not emergency: 20% == THRESH_CRITICAL)
+  #   Note: soil=20% equals the critical boundary — just above triggers REDUCE logic
+  # ═══════════════════════════════════════════════════════════════════════════
+  - set-control:
+      id: soil_pot
+      name: value
+      value: 0.20
+  - delay: 2500
+  - serial-monitor:
+      wait-for: "Mode    : REDUCE"
+      timeout: 3000
+  - serial-monitor:
+      wait-for: ">> PUMP : ON"
+      timeout: 3000
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Scenario 6 — INCREASE mode: soil below 55% threshold → PUMP ON
+  #   Soil=42%  Rain=1mm  Mode=INCREASE (threshold=55%)
+  #   Expected: soil 42% < 55% threshold → PUMP ON
+  # ═══════════════════════════════════════════════════════════════════════════
+  # Button press cycles REDUCE → INCREASE
+  - set-control:
+      id: btn1
+      name: pressed
+      value: 1
+  - delay: 1500
+  - set-control:
+      id: btn1
+      name: pressed
+      value: 0
+  - delay: 500
+  - set-control:
+      id: soil_pot
+      name: value
+      value: 0.42
+  - delay: 2500
+  - serial-monitor:
+      wait-for: "Mode    : INCREASE"
+      timeout: 3000
+  - serial-monitor:
+      wait-for: ">> PUMP : ON"
+      timeout: 3000
